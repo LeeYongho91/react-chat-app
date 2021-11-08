@@ -1,6 +1,5 @@
 import './App.css';
 import {
-  BrowserRouter as Router,
   Switch,
   Route,
   useHistory
@@ -12,7 +11,7 @@ import RegisterPage from './components/RegisterPage/RegisterPage';
 import { getAuth, onAuthStateChanged } from './firebase';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {setUser} from './redux/actions/user_action'
+import {setUser, clearUser} from './redux/actions/user_action'
 
 function App() {
   let history = useHistory();
@@ -23,11 +22,13 @@ function App() {
     const auth = getAuth();
 
     onAuthStateChanged(auth, (user) => {
+      console.log(user);
       if (user) {
         history.push('/');
         dispatch(setUser(user));
       } else {
         history.push('/login');
+        dispatch(clearUser(user));
       }
     });
   }, [history,dispatch]);
@@ -40,15 +41,13 @@ function App() {
     )
   } else {
     return (
-      <Router>
           <Switch>
             <Route path="/" exact component={ChatPage} />
             <Route path="/login" exact component={LoginPage} />
             <Route path="/register" exact component={RegisterPage} />
           </Switch>
-      </Router>
     );
-  }
+    }
 };
 
 

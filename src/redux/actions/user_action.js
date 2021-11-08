@@ -1,4 +1,4 @@
-import {SET_USER} from './types'
+import {SET_USER, CLEAR_USER} from './types'
 
 
 export function setUser(user) {
@@ -7,3 +7,11 @@ export function setUser(user) {
         payload: user
     }
 }
+
+export function clearUser() {
+    return {
+        type: CLEAR_USER
+    }
+}
+
+
