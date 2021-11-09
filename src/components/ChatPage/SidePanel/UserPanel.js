@@ -2,19 +2,22 @@ import React, {useRef} from 'react';
 import {IoIosChatboxes} from 'react-icons/io';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Image from 'react-bootstrap/Image';
-import {useSelector} from 'react-redux';
-import {getAuth, signOut, storage} from '../../../firebase';
-import mime from 'mime-types'
+import { useDispatch, useSelector} from 'react-redux';
+import {getAuth, ref, getDatabase, signOut, getStorage, stroageRef, uploadBytes, updateProfile, getDownloadURL, update} from '../../../firebase';
+import mime from 'mime-types';
+import {setPhotoURL} from '../../../redux/actions/user_action';
+
 
 
 function UserPanel() {
 
+    const auth = getAuth();
+    const dispatch = useDispatch();
     const user = useSelector(state => state.user.currentUser);
 
     const inputOpenImageRef = useRef();
 
     const handleLogout = async () => {
-        const auth = getAuth();
         await signOut(auth);
     };
 
@@ -25,19 +28,37 @@ function UserPanel() {
     const handleUploadImage = async (e) => {
         const file = e.target.files[0];
         const metadata = {contentType: mime.lookup(file.name)};
-        const storageRef = storage().ref();
+        const storage = getStorage();
+        const stroageREF = stroageRef(storage, `user_image/${user.uid}`);
+        const db = getDatabase();
 
+    
         try {
-            let uploadTaskSnapshot = await storageRef.child(`user_image/${user.uid}`)
-            .put(file, metadata);
+            let uploadTaskSnapshot = await uploadBytes(stroageREF, 
+            file, metadata);
 
+            let downloadURL = await getDownloadURL(stroageREF);
+         
+            // 프로필 이미지 수정
+            await updateProfile(auth.currentUser, {
+                photoURL: downloadURL
+            });
+
+            dispatch(setPhotoURL(downloadURL));
+
+            const updates = {};
+            updates[ `users/ + ${user.uid}`] = {
+                image : downloadURL
+            };
+
+            await update(ref(db), updates);
+            
             console.log('uploadTaskSnapshot', uploadTaskSnapshot);
         } 
         catch(e) {
-
+            console.log(e);
         }
         
-        // 스토리지에 파일 저장하기
     };
 
     return (
