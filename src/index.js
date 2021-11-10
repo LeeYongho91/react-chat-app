@@ -36,38 +36,25 @@ ReactDOM.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-function solution(arr) {
+function solution(s) {
 
-  let answer = 0;
-  let n = arr.length;
-  let posX = [0,0,-1,1];
-  let posY = [1,-1,0,0];
+  let answer = '';
+  let cnt = 1;
 
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      let check = true;
-      for (let k = 0; k < 4; k++) {
-
-        let px = i + posX[k];
-        let py = j + posY[k];
-
-        if(px >= 0 && px < n && py >= 0 && py < n && arr[i][j] <= arr[px][py]) {
-          check = false;
-          break;
-        }
-      }
-
-      if(check) answer++;
+  for (let i = 0; i < s.length; i++) {
+    
+    if(s[i] === s[i+1]) {
+      cnt++;
+    } 
+    else {
+      answer += s[i];
+      if(cnt !== 1) answer += cnt;
+      cnt = 1;
     }
   }
-
-
-
+  
   return answer;
+
 }
 
-console.log(solution([[5,3,7,2,3],
-                      [3,7,1,6,1],
-                      [7,2,5,3,4],
-                      [4,3,6,4,1],
-                      [8,7,3,5,2]]));
+console.log(solution('KKHSSSSSSSE'));

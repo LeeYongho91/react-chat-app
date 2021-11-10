@@ -1,7 +1,7 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import { useForm } from 'react-hook-form'; 
-import {getAuth, createUserWithEmailAndPassword, updateProfile, getDatabase, ref, set} from '../../firebase'
+import {getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, getDatabase, ref, set} from '../../firebase'
 import md5 from 'md5';
 
 function RegisterPage() {
@@ -28,7 +28,9 @@ function RegisterPage() {
                 image: createUser.user.photoURL,      
               });
 
-            setLoading(false);
+           await signInWithEmailAndPassword(auth, data.email, data.password);
+
+           // setLoading(false);
                
         } catch (error) {
             const errorCode = error.code;
@@ -37,6 +39,10 @@ function RegisterPage() {
             setErrorFromSubmit(errorCode + errorMessage);   
         }
     };
+
+    useEffect(() => {
+        return () => setLoading(false); // cleanup function을 이용
+      }, []);
 
     const password = useRef();
     password.current = watch('password');

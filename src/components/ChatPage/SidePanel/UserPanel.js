@@ -15,6 +15,8 @@ function UserPanel() {
     const dispatch = useDispatch();
     const user = useSelector(state => state.user.currentUser);
 
+    console.log(user);
+
     const inputOpenImageRef = useRef();
 
     const handleLogout = async () => {
@@ -32,7 +34,6 @@ function UserPanel() {
         const stroageREF = stroageRef(storage, `user_image/${user.uid}`);
         const db = getDatabase();
 
-    
         try {
             let uploadTaskSnapshot = await uploadBytes(stroageREF, 
             file, metadata);
