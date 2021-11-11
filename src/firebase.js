@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { getDatabase, ref, set, update, push, child } from "firebase/database";
+import { getDatabase, ref, set, update, push, child, onValue, onChildAdded } from "firebase/database";
 import { getStorage, ref as stroageRef, uploadBytes, getDownloadURL } from "firebase/storage"
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -36,5 +36,7 @@ export {getAuth,
         getDownloadURL,
         update,
         push,
-        child
+        child,
+        onValue,
+        onChildAdded
         };

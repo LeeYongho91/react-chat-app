@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import {connect} from 'react-redux';
-import { getDatabase, ref, push, update, child} from '../../../firebase';
+import { getDatabase, ref, push, update, child, onChildAdded} from '../../../firebase';
 
 
 export class ChatRooms extends Component {
@@ -16,8 +16,28 @@ export class ChatRooms extends Component {
         show: false,
         name: '',
         description: '',
-        chatRoomsRef: ref(this.db)
-    }
+        chatRoomsRef: ref(this.db),
+        chatRooms: []
+    };
+
+
+    componentDidMount() {
+        this.AddChatRoomsListeners();
+    };
+
+    AddChatRoomsListeners = () => {
+        let chatRoomsArray = [];
+
+        const chatRoomsRef = ref(this.db, 'chatRooms');
+        onChildAdded(chatRoomsRef, (snapshot) => {
+        const data = snapshot.val();
+        chatRoomsArray.push(data);
+        this.setState({chatRooms: chatRoomsArray});
+        });
+
+        console.log(this.state.chatRooms);
+
+     };
 
     handleClose = () => this.setState({show:false});
     handleShow = () => this.setState({show:true});
@@ -67,6 +87,17 @@ export class ChatRooms extends Component {
 
     isFormValid = (name, description) => 
         name && description;
+
+
+    renderChatRooms = (chatRooms) =>
+        
+        chatRooms.length > 0 &&
+        chatRooms.map(room => (
+            <li key={room.id}>
+                # {room.name}
+            </li>
+        ))
+    
     
 
 
@@ -84,6 +115,11 @@ export class ChatRooms extends Component {
                     position: 'absolute',
                     right: 0, cursor: 'pointer'                  
                 }} onClick={this.handleShow} />
+
+
+                <ul style={{listStyleType: 'none', padding: '0'}}>
+                    {this.renderChatRooms(this.state.chatRooms)}
+                </ul>
 
 
                 {/* ADD CHAT ROOM MODAL */}
