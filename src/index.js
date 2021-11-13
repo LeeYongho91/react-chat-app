@@ -38,31 +38,21 @@ reportWebVitals();
 
 
 
-function solution(n, m ,arr) {
+function solution(n,k,arr) {
 
-  let answer = 0;
-  let cnt = 0;
-  let pi = 0;
-  let pj = 0;
+  let answer = Number.MIN_SAFE_INTEGER;
+  let sum = 0;
 
-  for (let i = 1; i <= n; i++) {
-    for (let j = 1; j <= n; j++) {
-      cnt = 0;
-      for (let k = 0; k < m; k++) {
-        for (let s = 0; s < n; s++) {
-          if(arr[k][s] === i) pi = s;
-          if(arr[k][s] === j) pj = s;
-        }
-        if(pi > pj) cnt++;
-      }
-      if(cnt === m) answer++; 
-    }
-  }
-  
-  
-  
-  return answer;
-
+  // 슬라이딩 윈도우 
+  for (let i = 0; i < k; i++) {
+    sum += arr[i];
 }
 
-console.log(solution(4,3,[[3,4,1,2], [4,3,2,1], [3,1,4,2]]));
+  for (let i = k; i < arr.length; i++) {
+      sum += (arr[i] - arr[i-k]);
+      answer = Math.max(answer, sum);
+  }
+  return answer;
+}
+
+console.log(solution(10,3,[12,15,11,20,25,10,20,19,13,15]));

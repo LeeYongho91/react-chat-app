@@ -5,7 +5,8 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import {connect} from 'react-redux';
-import { getDatabase, ref, push, update, child, onChildAdded} from '../../../firebase';
+import { getDatabase, ref, push, update, child, onChildAdded, off} from '../../../firebase';
+import {setCurrentChatRoom} from '../../../redux/actions/chatRoom_action';
 
 
 export class ChatRooms extends Component {
@@ -16,8 +17,10 @@ export class ChatRooms extends Component {
         show: false,
         name: '',
         description: '',
-        chatRoomsRef: ref(this.db),
-        chatRooms: []
+        chatRoomsRef: ref(this.db, 'chatRooms'),
+        chatRooms: [],
+        firstLoad: true,
+        activeChatRoomId: ''
     };
 
 
@@ -25,14 +28,28 @@ export class ChatRooms extends Component {
         this.AddChatRoomsListeners();
     };
 
+    componentWillUnmount() {
+        off(this.state.chatRoomsRef);
+    };
+
+    setFirstChatRoom = () => {
+        const firstChatRoom = this.state.chatRooms[0];
+        if(this.state.firstLoad && this.state.chatRooms.length > 0) {
+            this.props.dispatch(setCurrentChatRoom(firstChatRoom));
+            this.setState({activeChatRoomId: firstChatRoom.id})
+        }
+        this.setState({firstLoad: false});
+    };
+
     AddChatRoomsListeners = () => {
         let chatRoomsArray = [];
 
-        const chatRoomsRef = ref(this.db, 'chatRooms');
-        onChildAdded(chatRoomsRef, (snapshot) => {
+        onChildAdded(this.state.chatRoomsRef, (snapshot) => {
         const data = snapshot.val();
         chatRoomsArray.push(data);
-        this.setState({chatRooms: chatRoomsArray});
+        this.setState({chatRooms: chatRoomsArray}, () => {
+            this.setFirstChatRoom();
+        });
         });
 
         console.log(this.state.chatRooms);
@@ -54,7 +71,7 @@ export class ChatRooms extends Component {
     };
 
     addChatRoom = async () => {
-        const key = push(child(this.state.chatRoomsRef, 'chatRooms')).key;
+        const key = push(this.state.chatRoomsRef).key;
         const {name, description} = this.state;
         const {user} = this.props;
 
@@ -69,9 +86,10 @@ export class ChatRooms extends Component {
         }
 
         try {
-            const updates = {};
-            updates['chatRooms/' + key] = newChatRoom;
-            await update(this.state.chatRoomsRef, updates);
+            // const updates = {};
+            // updates['chatRooms/' + key] = newChatRoom;
+            // await update(this.state.chatRoomsRef, updates);
+            await update(child(this.state.chatRoomsRef, key), newChatRoom);
             this.setState({
                 name: "",
                 description: "",
@@ -80,44 +98,47 @@ export class ChatRooms extends Component {
         } catch (error) {
             console.log(error);
         }
-
-        
-        
     };
 
     isFormValid = (name, description) => 
         name && description;
 
+    changeChatRoom = (room) => {
+        this.props.dispatch(setCurrentChatRoom(room));
+        this.setState({activeChatRoomId: room.id});
+    };
 
     renderChatRooms = (chatRooms) =>
         
         chatRooms.length > 0 &&
         chatRooms.map(room => (
-            <li key={room.id}>
+            <li style={{cursor:'pointer', backgroundColor: room.id === this.state.activeChatRoomId && 
+              "#ffffff45"   
+            }} key={room.id} onClick={() => this.changeChatRoom(room)}>
                 # {room.name}
             </li>
         ))
     
-    
-
-
     render() {
         return (
             <div>
               <div style={{
-                  position: 'relative', width: '100%',
-                  display: 'flex', alignItems: 'center'
-              }}>
+                    position: 'relative', width: '100%',
+                    display: 'flex', alignItems: 'center'
+                }}>
 
-                <FaRegSmileWink style={{marginRight: 3}} />
-                CHAT ROOMS {" "} (1)
-                <FaPlus style={{
-                    position: 'absolute',
-                    right: 0, cursor: 'pointer'                  
-                }} onClick={this.handleShow} />
+                    <FaRegSmileWink style={{ marginRight: 3 }} />
+                    CHAT ROOMS {" "} ({this.state.chatRooms.length})
 
+                    <FaPlus
+                        onClick={this.handleShow}
+                        style={{
+                            position: 'absolute',
+                            right: 0, cursor: 'pointer'
+                        }} />
+                </div>
 
-                <ul style={{listStyleType: 'none', padding: '0'}}>
+                <ul style={{ listStyleType: 'none', padding: 0 }}>
                     {this.renderChatRooms(this.state.chatRooms)}
                 </ul>
 
@@ -156,9 +177,7 @@ export class ChatRooms extends Component {
                     </Modal.Footer>
                 </Modal>
                 
-            </div>
-            </div>
-         
+            </div>     
         )
     }
 }
