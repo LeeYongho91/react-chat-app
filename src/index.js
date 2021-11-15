@@ -36,49 +36,30 @@ ReactDOM.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-// 시간복잡도 O(n^2)
-function compareMaps(map1, map2) {
-
-  if(map1.size !== map2.size) return false;
-
-  for(let [key, val] of map1) {
-      if(!map2.has(key) || map2.get(key) !== val) return false;
-  }
-  return true;  
-}
-
-function solution(s, t) {
-
-  let answer = 0;
-  let th = new Map();
-  let sh = new Map();
-
-  for(let x of t) {
-      if(th.has(x)) th.set(x, th.get(x) + 1);
-      else th.set(x, 1);
-  }
-
-  let len = t.length - 1;
-
-  for (let i = 0; i < len; i++) {
-      if(sh.has(s[i])) sh.set(s[i], sh.get(s[i]) + 1);
-      else sh.set(s[i], 1);
-  }
-
-  let lt = 0;
+    function solution(board, moves){
   
-  for (let rt = len; rt < s.length; rt++) {
-      if(sh.has(s[rt])) sh.set(s[rt], sh.get(s[rt]) + 1);
-      else sh.set(s[rt], 1);
+      let answer = 0;
+      let stack = [];
 
-      if(compareMaps(sh, th)) answer++;
-  
-      sh.set(s[lt], sh.get(s[lt]) - 1);
-      if(sh.get(s[lt]) === 0) sh.delete(s[lt]);
-      lt++;
-  }
+      for (let i = 0; i < moves.length; i++) {
+          for (let j = 0; j < board.length; j++) {
+              if(board[j][moves[i]-1] !== 0) {
+                if(stack[stack.length - 1] === board[j][moves[i]-1]) {
+                  stack.pop();
+                  answer += 2;
+                }
+                else stack.push(board[j][moves[i]-1]);
 
-  return answer;
-}
+                board[j][moves[i]-1] = 0;
+                break;
+              }           
+          }                   
+        }                
+      return answer;      
+      }
 
-console.log(solution('bacaAacba', 'abc'));
+      console.log(solution([[0,0,0,0,0],
+                            [0,0,1,0,3], 
+                            [0,2,5,0,1], 
+                            [4,2,4,4,2], 
+                            [3,5,1,3,1]], [1,5,3,5,1,2,1,4]));
