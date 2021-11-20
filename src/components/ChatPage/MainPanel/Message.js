@@ -1,5 +1,5 @@
 import React from 'react'
-import { MDBMedia } from 'mdbreact';
+// import Media from 'react-bootstrap/Media';
 import moment from 'moment';
 
 function Message({ message, user }) {
@@ -15,46 +15,26 @@ function Message({ message, user }) {
        }
     }
 
-
-
     return (
-        // <Media style={{ marginBottom: '3px' }}>
-        //     <img
-        //         style={{ borderRadius: '10px' }}
-        //         width={48}
-        //         height={48}
-        //         className="mr-3"
-        //         src={message.user.image}
-        //         alt={message.user.name}
-        //     />
-        //     <Media.Body style={{
-        //         backgroundColor: isMessageMine(message, user) && "#ECECEC"
-        //     }}>
-        //         <h6>{message.user.name}{" "}
-        //             <span style={{ fontSize: '10px', color: 'gray' }}>
-        //                 {timeFromNow(message.timestamp)}
-        //             </span>
-        //         </h6>
-        //         {isImage(message) ?
-        //             <img style={{ maxWidth: '300px' }} alt="이미지" src={message.image} />
-        //             :
-        //             <p>
-        //                 {message.content}
-        //             </p>
-        //         }
-        //     </Media.Body>
-        // </Media>
-        <MDBMedia>
-      <MDBMedia left className="mr-3" href="#">
-        <MDBMedia object src="https://mdbootstrap.com/img/Photos/Others/placeholder1.jpg" alt="" />
-      </MDBMedia>
-      <MDBMedia body>
-        <MDBMedia heading>
-          Media heading
-      </MDBMedia>
-        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-    </MDBMedia>
-    </MDBMedia>
+      <div>
+        <div className="chat-container">
+  <img src={message.user.image} alt="Avatar" />
+
+  <p>Hello. How are you today?</p>
+  <span className="time-right"> <h6>{message.user.name}{" "}
+                    <span style={{ fontSize: '10px', color: 'gray' }}>
+                        {timeFromNow(message.timestamp)}
+                    </span>
+                </h6></span>
+</div>
+
+<div className="chat-container darker">
+  <img src="/w3images/avatar_g2.jpg" alt="Avatar" className="right" />
+  <p>Hey! I'm fine. Thanks for asking!</p>
+  <span className="time-left">11:01</span>
+</div>
+      </div>
+      
     )
 }
 

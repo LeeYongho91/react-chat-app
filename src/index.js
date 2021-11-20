@@ -36,23 +36,17 @@ ReactDOM.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-    function solution(t,g){
+    function solution(arr){
   
-      let answer = 'YES';
-      let queue = [...t];
+      let answer = '';
 
-      for(let x of g) {
-        if(queue.indexOf(x) !== -1) {
-          if(x !== queue.shift()) answer = 'NO';
-        }
-      }
       
-      if(queue.length > 0) answer = 'NO';
+      
 
      
       return answer; 
       }
 
-      console.log(solution('CBA', 'CBDAGE'));
+      console.log(solution([13,5,11,7,23,15]));
 
     

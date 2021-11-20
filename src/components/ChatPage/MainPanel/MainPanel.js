@@ -26,7 +26,7 @@ export class MainPanel extends Component {
 
         if (chatRoom) {
             this.addMessagesListeners(chatRoom.id);
-            this.addTypingListeners(chatRoom.id);
+           // this.addTypingListeners(chatRoom.id);
         }
     }
 
