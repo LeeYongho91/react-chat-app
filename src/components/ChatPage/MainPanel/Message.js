@@ -17,21 +17,22 @@ function Message({ message, user }) {
 
     return (
       <div>
-        <div className="chat-container">
-  <img src={message.user.image} alt="Avatar" />
+        
+        <div className={isMessageMine(message, user) ? 'chat-container darker' : 'chat-container'} >
+  <img style={{borderRadius: '10px'}}
+        width={48}
+        height={48}
+  src={message.user.image} alt={message.user.name} className={isMessageMine(message, user) ? 'right' : '' } />
 
-  <p>Hello. How are you today?</p>
-  <span className="time-right"> <h6>{message.user.name}{" "}
+  {isImage(message) ? 
+  <img style={{maxWidth:'300px'}} alt="이미지" src={message.image}/>
+  :
+  <p>{message.content}</p>}
+  <span className={isMessageMine(message, user) ? 'time-left' : 'time-right' }> <h6>{message.user.name}{" "}
                     <span style={{ fontSize: '10px', color: 'gray' }}>
                         {timeFromNow(message.timestamp)}
                     </span>
                 </h6></span>
-</div>
-
-<div className="chat-container darker">
-  <img src="/w3images/avatar_g2.jpg" alt="Avatar" className="right" />
-  <p>Hey! I'm fine. Thanks for asking!</p>
-  <span className="time-left">11:01</span>
 </div>
       </div>
       
