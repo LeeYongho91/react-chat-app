@@ -36,21 +36,47 @@ ReactDOM.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-    function solution(arr){
-  
-      let answer = arr;
 
-      arr.sort((a,b) => {
-        if(a[0] === b[0]) return a[1] - b[1];
-        else return a[0] - b[0];
-      })
 
+    function count(stable, dist) {
+      let cnt = 1;
+      let ep = stable[0];
+
+      for (let i = 1; i < stable.length; i++) {
+        if(stable[i] - ep >= dist) {
+          cnt++;
+          ep = stable[i];
+        }  
+      }
+      return cnt;
+    }
+
+    function solution(c, stable){
       
+      let answer = 0;
+      stable.sort((a,b) => a-b);
+
+      let lt = 1
+      let rt = stable[stable.length -1];
+
+      while(lt<=rt) {
+        let mid = parseInt((lt+rt) / 2);
+
+        if(count(stable, mid) >= c) {
+          answer = mid;
+          lt = mid + 1;
+        }
+        else {
+          rt = mid - 1;     
+        }
+      }
       
       return answer; 
       }
-
-      console.log(solution([[2,7], [1,3], [1,2], [2,5], [3,6]]));
+      
+      console.log(solution(3, [1,2,8,4,9]));
 
  
+
+
 

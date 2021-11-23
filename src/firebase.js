@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { getDatabase, ref, set, update, push, child, onValue, onChildAdded, off } from "firebase/database";
-import { getStorage, ref as stroageRef, uploadBytes, getDownloadURL } from "firebase/storage"
+import { getStorage, ref as stroageRef, uploadBytes, getDownloadURL, uploadBytesResumable } from "firebase/storage"
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -39,5 +39,6 @@ export {getAuth,
         child,
         onValue,
         onChildAdded,
-        off
+        off,
+        uploadBytesResumable
         };

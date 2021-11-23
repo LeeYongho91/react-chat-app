@@ -25,14 +25,14 @@ function Message({ message, user }) {
   src={message.user.image} alt={message.user.name} className={isMessageMine(message, user) ? 'right' : '' } />
 
   {isImage(message) ? 
-  <img style={{maxWidth:'300px'}} alt="이미지" src={message.image}/>
+  <img style={{maxWidth:'100px', borderRadius: '0px'}} alt="이미지" src={message.image}/>
   :
   <p>{message.content}</p>}
-  <span className={isMessageMine(message, user) ? 'time-left' : 'time-right' }> <h6>{message.user.name}{" "}
+  <div style={{width:'100%', marginTop:'5px'}} className={isMessageMine(message, user) ? 'time-left' : 'time-right' }> <h6>{message.user.name}{" "}
                     <span style={{ fontSize: '10px', color: 'gray' }}>
                         {timeFromNow(message.timestamp)}
                     </span>
-                </h6></span>
+                </h6></div>
 </div>
       </div>
       
