@@ -17,6 +17,8 @@ function MessageForm() {
     const [loading, setLoading] = useState(false);
     const messagesRef = ref(getDatabase(), "messages");
     const inputOpenImageRef = useRef();
+    const [percentage, setPercentage] = useState(0);
+
     
 
     const handleChange = (event) => {
@@ -74,7 +76,7 @@ function MessageForm() {
         const storage = getStorage();
 
         if(!file) return;
-        const filePath = `/message/public/${file.name}.jpg`
+        const filePath = `/message/public/${file.name}`
         const metaData = {contentType:mime.lookup(file.name)};
         setLoading(true);
 
@@ -85,7 +87,9 @@ function MessageForm() {
             uploadTask.on('state_changed',
             (snapshot) => {
                 // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                progress = Math.round(progress);
+                setPercentage(progress);
                 console.log('Upload is ' + progress + '% done');
                 switch (snapshot.state) {
                     case 'paused':
@@ -141,7 +145,10 @@ function MessageForm() {
                 </Form.Group>
                 </Form>
 
-                <ProgressBar variant="warning" label="60%" now={60} />
+                {
+                !(percentage === 0 || percentage === 100) &&
+                <ProgressBar variant="warning" label={`${percentage}%`} now={percentage} />
+                }
 
                 <div>
                 {errors.map(errorMsg => <p style={{ color: 'red' }} key={errorMsg}>
@@ -172,7 +179,7 @@ function MessageForm() {
                 </Col>
             </Row>
 
-            <input onChange={handleUploadImage} style={{display: 'none'}} ref={inputOpenImageRef} type="file" />
+            <input accept="image/jpeg, image/png" onChange={handleUploadImage} style={{display: 'none'}} ref={inputOpenImageRef} type="file" />
 
         </div>
     )
