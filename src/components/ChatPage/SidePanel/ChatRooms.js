@@ -5,8 +5,9 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import {connect} from 'react-redux';
-import { getDatabase, ref, push, update, child, onChildAdded, off} from '../../../firebase';
+import { onValue, getDatabase, ref, push, update, child, onChildAdded, off} from '../../../firebase';
 import {setCurrentChatRoom} from '../../../redux/actions/chatRoom_action';
+import Badge from 'react-bootstrap/Badge';
 
 
 export class ChatRooms extends Component {
@@ -18,14 +19,17 @@ export class ChatRooms extends Component {
         name: '',
         description: '',
         chatRoomsRef: ref(this.db, 'chatRooms'),
+        messagesRef: ref(getDatabase(), "messages"),
         chatRooms: [],
         firstLoad: true,
-        activeChatRoomId: ''
+        activeChatRoomId: '',
+        notifications: []
     };
 
 
     componentDidMount() {
         this.AddChatRoomsListeners();
+        console.log(this.state.notifications);
     };
 
     componentWillUnmount() {
@@ -50,11 +54,68 @@ export class ChatRooms extends Component {
         this.setState({chatRooms: chatRoomsArray}, () => {
             this.setFirstChatRoom();
         });
+
+        this.addNotificationListener(snapshot.key)
         });
 
         console.log(this.state.chatRooms);
 
+
      };
+
+     addNotificationListener = (chatRoomId) => {
+        let { messagesRef } = this.state;
+        onValue(child(messagesRef, chatRoomId), DataSnapshot => {
+            if (this.props.chatRoom) {
+                this.handleNotification(
+                    chatRoomId,
+                    this.props.chatRoom.id,
+                    this.state.notifications,
+                    DataSnapshot
+                )
+            }
+        })
+    }
+
+    handleNotification = (chatRoomId, currentChatRoomId, notifications, DataSnapshot) => {
+
+        let lastTotal = 0;
+
+        // 이미 notifications state 안에 알림 정보가 들어있는 채팅방과 그렇지 않은 채팅방을 나눠주기 
+        let index = notifications.findIndex(notification =>
+            notification.id === chatRoomId)
+
+        //notifications state 안에 해당 채팅방의 알림 정보가 없을 때 
+        if (index === -1) {
+            notifications.push({
+                id: chatRoomId,
+                total: DataSnapshot.size,
+                lastKnownTotal: DataSnapshot.size,
+                count: 0
+            })
+        }
+        // 이미 해당 채팅방의 알림 정보가 있을 떄 
+        else {
+            //상대방이 채팅 보내는 그 해당 채팅방에 있지 않을 때 
+            if (chatRoomId !== currentChatRoomId) {
+                //현재까지 유저가 확인한 총 메시지 개수 
+                lastTotal = notifications[index].lastKnownTotal
+
+                //count (알림으로 보여줄 숫자)를 구하기 
+                //현재 총 메시지 개수 - 이전에 확인한 총 메시지 개수 > 0
+                //현재 총 메시지 개수가 10개이고 이전에 확인한 메시지가 8개 였다면 2개를 알림으로 보여줘야함.
+                if (DataSnapshot.size - lastTotal > 0) {
+                    notifications[index].count = DataSnapshot.size - lastTotal;
+                }
+            }
+            //total property에 현재 전체 메시지 개수를 넣어주기
+            notifications[index].total = DataSnapshot.size;
+        }
+        //목표는 방 하나 하나의 맞는 알림 정보를 notifications state에  넣어주기 
+        this.setState({ notifications })
+        console.log(this.state.notifications);
+
+    }
 
     handleClose = () => this.setState({show:false});
     handleShow = () => this.setState({show:true});
@@ -108,6 +169,18 @@ export class ChatRooms extends Component {
         this.setState({activeChatRoomId: room.id});
     };
 
+    getNotificationCount = (room) => {
+        //해당 채팅방의 count수를 구하는 중입니다.
+        let count = 0;
+
+        this.state.notifications.forEach(notification => {
+            if (notification.id === room.id) {
+                count = notification.count;
+            }
+        })
+        if (count > 0) return count;
+    }
+
     renderChatRooms = (chatRooms) =>
         
         chatRooms.length > 0 &&
@@ -116,6 +189,10 @@ export class ChatRooms extends Component {
               "#ffffff45"   
             }} key={room.id} onClick={() => this.changeChatRoom(room)}>
                 # {room.name}
+            <Badge style={{float: 'right', marginTop: '2px'}} bg="danger">
+            {this.getNotificationCount(room)}
+            </Badge>
+
             </li>
         ))
     
@@ -185,7 +262,9 @@ export class ChatRooms extends Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.user.currentUser
+        user: state.user.currentUser,
+        chatRoom: state.chatRoom.currentChatRoom
+
     }
 }
 
