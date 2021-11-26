@@ -29,11 +29,13 @@ export class ChatRooms extends Component {
 
     componentDidMount() {
         this.AddChatRoomsListeners();
-        console.log(this.state.notifications);
     };
 
     componentWillUnmount() {
         off(this.state.chatRoomsRef);
+        // this.state.ChatRooms.forEach(chatRoom => {
+        // off(this.state.chatRoomsRef.child(chatRoom['id']));
+        // })   
     };
 
     setFirstChatRoom = () => {
@@ -57,8 +59,6 @@ export class ChatRooms extends Component {
 
         this.addNotificationListener(snapshot.key)
         });
-
-        console.log(this.state.chatRooms);
 
 
      };
@@ -113,7 +113,7 @@ export class ChatRooms extends Component {
         }
         //목표는 방 하나 하나의 맞는 알림 정보를 notifications state에  넣어주기 
         this.setState({ notifications })
-        console.log(this.state.notifications);
+        //onsole.log(this.state.notifications);
 
     }
 
@@ -140,7 +140,7 @@ export class ChatRooms extends Component {
             id: key,
             name: name,
             description: description,
-            createBy: {
+            createdBy: {
                 name: user.displayName,
                 image: user.photoURL
             }
@@ -167,7 +167,23 @@ export class ChatRooms extends Component {
     changeChatRoom = (room) => {
         this.props.dispatch(setCurrentChatRoom(room));
         this.setState({activeChatRoomId: room.id});
+        this.clearNotifications();
     };
+
+    clearNotifications = () => {
+        let index = this.state.notifications.findIndex(
+            notification => notification.id === this.props.chatRoom.id
+        )
+
+        if(index !== -1) {
+            let updatedNotifications = [...this.state.notifications];
+            updatedNotifications[index].lastKnownTotal = this.state.notifications[index].total;
+            updatedNotifications[index].count = 0;
+            this.setState({notifications: updatedNotifications});
+
+        }
+    }
+
 
     getNotificationCount = (room) => {
         //해당 채팅방의 count수를 구하는 중입니다.
